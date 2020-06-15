@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">rcgnz</string>
+    <string name="send_text">Check!     </string>
+    <string name="result_string">Waiting for you to press the empty area!</string>
+</resources>
