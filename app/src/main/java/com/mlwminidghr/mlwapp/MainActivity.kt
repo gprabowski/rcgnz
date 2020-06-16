@@ -22,8 +22,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.ViewModelProviders.*
+import androidx.lifecycle.ViewModelProviders.of
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
@@ -39,22 +38,24 @@ const val IMAGE_PICK = 2
 class MainActivity : AppCompatActivity() {
     private val colorChosen = "#5B44A2"
     private val colorAccent = "#53ABE3"
+
     enum class Mode {
         PET, FACE, TRAFFIC, PLANT
     }
+
     private var mode = Mode.FACE
-    private lateinit var image : ImageView
-    private lateinit var fab : FloatingActionButton
-    private lateinit var text : TextView
+    private lateinit var image: ImageView
+    private lateinit var fab: FloatingActionButton
+    private lateinit var text: TextView
     private lateinit var plantButton: ImageButton
-    private lateinit var petButton : ImageButton
-    private lateinit var trafficButton : ImageButton
-    private lateinit var faceButton : ImageButton
+    private lateinit var petButton: ImageButton
+    private lateinit var trafficButton: ImageButton
+    private lateinit var faceButton: ImageButton
     private var imageData: ByteArray? = null
     private val postURL: String = "http://161.35.118.47:8000/prediction/"
     private lateinit var currentPhotoPath: String
-    private lateinit var currentPhotoUri : Uri
-    private val appViewModel : AppViewModel by lazy {
+    private lateinit var currentPhotoUri: Uri
+    private val appViewModel: AppViewModel by lazy {
         of(this).get(AppViewModel::class.java)
     }
 
@@ -78,11 +79,11 @@ class MainActivity : AppCompatActivity() {
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             takePictureIntent.resolveActivity(packageManager)?.also {
-            val photoFile: File? = try {
-                createImageFile()
-            } catch (ex: IOException) {
-                null
-            }
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    null
+                }
                 photoFile?.also {
                     val photoURI: Uri = FileProvider.getUriForFile(
                         this,
@@ -93,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
                 }
-        }
+            }
         }
     }
 
@@ -147,7 +148,7 @@ class MainActivity : AppCompatActivity() {
             mode = Mode.TRAFFIC
             appViewModel.mode = Mode.TRAFFIC
         }
-        fab.setOnClickListener{
+        fab.setOnClickListener {
             val mAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate)
             fab.startAnimation(mAnimation)
             uploadImage()
@@ -159,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             launchGallery()
             return@setOnLongClickListener true
         }
-        if(appViewModel.photoBitmap != null) {
+        if (appViewModel.photoBitmap != null) {
             image.setImageBitmap(appViewModel.photoBitmap)
             text.text = appViewModel.currentText
             currentPhotoUri = appViewModel.currentPhotoUri!!
@@ -169,44 +170,55 @@ class MainActivity : AppCompatActivity() {
             faceButton.setColorFilter(Color.parseColor(colorAccent))
             petButton.setColorFilter(Color.parseColor(colorAccent))
             trafficButton.setColorFilter(Color.parseColor(colorAccent))
-            if(mode == Mode.FACE)
-                faceButton.setColorFilter(Color.parseColor(colorChosen))
-            else if(mode == Mode.PLANT)
-                plantButton.setColorFilter(Color.parseColor(colorChosen))
-            else if(mode == Mode.PET)
-                petButton.setColorFilter(Color.parseColor(colorChosen))
-            else
-                trafficButton.setColorFilter(Color.parseColor(colorChosen))
+            when {
+                (mode == Mode.FACE) -> faceButton.setColorFilter(Color.parseColor(colorChosen))
+                (mode == Mode.PLANT) -> plantButton.setColorFilter(Color.parseColor(colorChosen))
+                (mode == Mode.PET) -> petButton.setColorFilter(Color.parseColor(colorChosen))
+                else -> trafficButton.setColorFilter(Color.parseColor(colorChosen))
+            }
             createImageData(currentPhotoUri)
         }
     }
-    private fun scaleBitmap(bitmap: Bitmap) : Bitmap {
-        if(bitmap.height.toFloat() < 4096 && bitmap.width.toFloat() < 4096) {
+
+    private fun scaleBitmap(bitmap: Bitmap): Bitmap {
+        if (bitmap.height.toFloat() < 4096 && bitmap.width.toFloat() < 4096) {
             return bitmap
         }
-        return if(bitmap.width.toFloat() >= bitmap.height.toFloat()){
-            Bitmap.createScaledBitmap(bitmap, 4000, (bitmap.height.toFloat() * 4000 / bitmap.width.toFloat()).toInt(), false)
+        return if (bitmap.width.toFloat() >= bitmap.height.toFloat()) {
+            Bitmap.createScaledBitmap(
+                bitmap,
+                4000,
+                (bitmap.height.toFloat() * 4000 / bitmap.width.toFloat()).toInt(),
+                false
+            )
         } else {
-            Bitmap.createScaledBitmap(bitmap, (bitmap.width.toFloat() * 4000 / bitmap.height.toFloat()).toInt(), 4000,false)
+            Bitmap.createScaledBitmap(
+                bitmap,
+                (bitmap.width.toFloat() * 4000 / bitmap.height.toFloat()).toInt(),
+                4000,
+                false
+            )
         }
     }
+
     private fun uploadImage() {
-        val currentURL = when{
-            mode == Mode.TRAFFIC -> postURL + "sign/"
-            mode == Mode.PET -> postURL + "dog/"
-            mode == Mode.FACE -> postURL + "emotion/"
+        val currentURL = when (mode) {
+            Mode.TRAFFIC -> postURL + "sign/"
+            Mode.PET -> postURL + "dog/"
+            Mode.FACE -> postURL + "emotion/"
             else -> postURL + "flower/"
         }
-        imageData?: return
+        imageData ?: return
         val request = object : VolleyFileUploadRequest(
             Method.POST,
             currentURL,
             Response.Listener {
                 //image.setImageBitmap(BitmapFactory.decodeByteArray(it.data, 0, it.data.size))
-                if(it.headers["Content-Type"] == "image/png") {
+                if (it.headers["Content-Type"] == "image/png") {
                     appViewModel.currentText = R.string.image_request.toString()
                     image.setImageBitmap(BitmapFactory.decodeByteArray(it.data, 0, it.data.size))
                     text.setText(R.string.image_request)
+                    text.textSize = 14F
                 } else {
                     text.text = String(it.data)
                     appViewModel.currentText = String(it.data)
@@ -218,7 +230,7 @@ class MainActivity : AppCompatActivity() {
                 println(it)
             }
         ) {
-            override fun getByteData():MutableMap<String, FileDataPart> {
+            override fun getByteData(): MutableMap<String, FileDataPart> {
                 val params = HashMap<String, FileDataPart>()
                 params["myfile"] = FileDataPart("image", imageData!!, "jpeg")
                 return params
@@ -227,6 +239,7 @@ class MainActivity : AppCompatActivity() {
         request.retryPolicy = DefaultRetryPolicy(10000, 10, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
         Volley.newRequestQueue(this).add(request)
     }
+
     @Throws(IOException::class)
     private fun createImageData(uri: Uri) {
         val inputStream = contentResolver.openInputStream(uri)
@@ -234,6 +247,7 @@ class MainActivity : AppCompatActivity() {
             imageData = it.readBytes()
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -247,13 +261,12 @@ class MainActivity : AppCompatActivity() {
             appViewModel.photoBitmap = bitmap
             appViewModel.currentPhotoPath = currentPhotoPath
             appViewModel.currentPhotoUri = currentPhotoUri
-        }
-        else if(requestCode == IMAGE_PICK && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == IMAGE_PICK && resultCode == Activity.RESULT_OK) {
             text.setText(R.string.photo_selected)
             appViewModel.currentText = R.string.photo_selected.toString()
             text.textSize = 14F
             val uri = data?.data
-            if(uri != null) {
+            if (uri != null) {
                 val bitmap = scaleBitmap(getBitmap(this.contentResolver, uri))
                 image.setImageBitmap(bitmap)
                 createImageData(uri)
