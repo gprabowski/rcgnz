@@ -154,7 +154,9 @@ class MainActivity : AppCompatActivity() {
             uploadImage()
         }
         image.setOnClickListener {
-            dispatchTakePictureIntent()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                dispatchTakePictureIntent()
+            }
         }
         image.setOnLongClickListener {
             launchGallery()
