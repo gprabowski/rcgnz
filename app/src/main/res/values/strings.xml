@@ -2,4 +2,12 @@
     <string name="app_name">rcgnz</string>
     <string name="send_text">Check!     </string>
     <string name="result_string">Waiting for you to press the empty area!</string>
+    <string name="image_request">This functionality has a visual description!</string>
+    <string name="photo_selected">Now choose the mode and let\'s go!</string>
+    <string name="logo">logo</string>
+    <string name="image_loaded">Image Loaded</string>
+    <string name="dog_breed_recognition_button">Dog Breed Recognition Button</string>
+    <string name="emotion_recognition_button">Emotion recognition button</string>
+    <string name="traffic_sign_recognition_button">Traffic sign recognition button</string>
+    <string name="flower_recognition_button">flower recognition button</string>
 </resources>
