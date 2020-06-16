@@ -95,19 +95,18 @@
             android:tint="#53ABE3"
             android:contentDescription="@string/flower_recognition_button" />
 
-
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end|bottom"
+            android:clickable="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/ic_baseline_send_24"
+            app:backgroundTint="#715DAE"
+            android:focusable="true" />
     </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="10"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:src="@drawable/ic_baseline_send_24"
-        app:backgroundTint="#715DAE" />
 
 
 </LinearLayout>
